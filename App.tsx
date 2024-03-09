@@ -19,6 +19,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 const SIZE = 100.0;
+const CIRCLE_RADIUS = SIZE * 2;
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 function App(): React.JSX.Element {
@@ -29,7 +30,6 @@ function App(): React.JSX.Element {
 
   const onDrag = Gesture.Pan()
     .onBegin(() => {
-      console.log('begin');
       contextX.value = translateX.value;
       contextY.value = translateY.value;
     })
@@ -38,8 +38,11 @@ function App(): React.JSX.Element {
       translateY.value = event.translationY + contextY.value;
     })
     .onEnd(() => {
-      translateX.value = withSpring(0);
-      translateY.value = withSpring(0);
+      const distance = Math.sqrt(translateX.value ** 2 + translateY.value ** 2);
+      if (distance < CIRCLE_RADIUS + SIZE / 2) {
+        translateX.value = withSpring(0);
+        translateY.value = withSpring(0);
+      }
     });
 
   const rStyle = useAnimatedStyle(() => ({
@@ -49,9 +52,11 @@ function App(): React.JSX.Element {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <GestureDetector gesture={onDrag}>
-          <AnimatedView style={[styles.square, rStyle]} />
-        </GestureDetector>
+        <AnimatedView style={styles.circle}>
+          <GestureDetector gesture={onDrag}>
+            <AnimatedView style={[styles.square, rStyle]} />
+          </GestureDetector>
+        </AnimatedView>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -69,6 +74,15 @@ const styles = StyleSheet.create({
     height: SIZE,
     backgroundColor: 'rgba(0,0,256, 0.5)',
     borderRadius: 20,
+  },
+  circle: {
+    width: CIRCLE_RADIUS * 2,
+    height: CIRCLE_RADIUS * 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: CIRCLE_RADIUS,
+    borderWidth: 5,
+    borderColor: 'rgba(0,0,256, 0.5)',
   },
 });
 
