@@ -15,6 +15,7 @@ import {
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
 } from 'react-native-reanimated';
 
 const SIZE = 100.0;
@@ -37,7 +38,8 @@ function App(): React.JSX.Element {
       translateY.value = event.translationY + contextY.value;
     })
     .onEnd(() => {
-      console.log('on End');
+      translateX.value = withSpring(0);
+      translateY.value = withSpring(0);
     });
 
   const rStyle = useAnimatedStyle(() => ({
